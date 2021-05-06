@@ -10,6 +10,9 @@ class Scene2 extends Phaser.Scene{
         this.load.tilemapTiledJSON('Lac', 'Asset/Lac.json');
         this.load.image('Map',"Asset/Asset_Foret.png");
         this.load.spritesheet("Ennemi","Asset/Renard.png", { frameWidth: 32 , frameHeight: 26 });
+        this.load.spritesheet("Vie","Asset/life.png" , { frameWidth: 80, frameHeight: 39.5 });
+        this.load.spritesheet("NbOeuf","Asset/CompteOeuf.png" , { frameWidth: 32, frameHeight: 26 });
+
     }
 
     create(){
@@ -27,13 +30,22 @@ class Scene2 extends Phaser.Scene{
         this.arbre32 =map3.createStaticLayer('Arbre', tileset)
         this.sorti12 =map3.createStaticLayer('Sortie', tileset)
         this.bloquage3 =map3.createStaticLayer('Blocage', tileset)
+        
 
         this.sorti12.setCollisionByExclusion(-1, true);
         this.bloquage3.setCollisionByExclusion(-1, true);
 
+        ennemi = this.physics.add.sprite(100,250,"Ennemi");
+        ennemi2 = this.physics.add.sprite(1000,500,"Ennemi");
+
         this.physics.add.collider(player, this.surSol);
         this.physics.add.collider(player, this.sorti12,Sortie12);
         this.physics.add.collider(player, this.bloquage3);
+        this.physics.add.collider(player, ennemi,Degat);
+        this.physics.add.collider(player, ennemi2,Degat);
+        this.physics.add.collider(ennemi,this.blocage);
+        this.physics.add.collider(ennemi2,this.blocage);
+
 
         cursors = this.input.keyboard.createCursorKeys();
         buttonI = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.I);
@@ -44,8 +56,11 @@ class Scene2 extends Phaser.Scene{
         this.cameras.main.setBounds(0, 0, 1280, 780);
         this.cameras.main.setZoom(3);
         
-        ennemi = this.physics.add.sprite(100,250,"Ennemi");
-        ennemi2 = this.physics.add.sprite(1000,500,"Ennemi");
+        
+        vie = this.physics.add.sprite(470,280,"Vie");
+        vie.setScrollFactor(0,0);
+        nbOeuf = this.physics.add.sprite(560,280,"NbOeuf");
+        nbOeuf.setScrollFactor(0,0);
 
         this.anims.create({
             key: 'left',
@@ -97,15 +112,51 @@ class Scene2 extends Phaser.Scene{
             repeat: -1
         });
         this.anims.create({
+            key: 'TroisC',
+            frames: [ { key: 'Vie', frame: 0 } ],
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'DeuxC',
+            frames: [ { key: 'Vie', frame: 1 } ],
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'UnC',
+            frames: [ { key: 'Vie', frame: 2 } ],
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: 'ZeroC',
+            frames: [ { key: 'Vie', frame: 3 } ],
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
+            key: '0Oeuf',
+            frames: [ { key: 'NbOeuf', frame: 0 } ],
+            frameRate: 10,
+            repeat: -1
+        });
+        this.anims.create({
             key: 'mob',
             frames: this.anims.generateFrameNumbers('Ennemi', { start: 0, end: 5 }),
             frameRate: 3,
             repeat: -1
         });
-
+        this.anims.create({
+            key: '1Oeuf',
+            frames: [ { key: 'NbOeuf', frame: 1 } ],
+            frameRate: 10,
+            repeat: -1
+        });
         tweens = this.tweens.add({
             targets: ennemi,
             x: 250,
+            y:250,
             paused: false,
             yoyo: true,
             repeat: -1
@@ -113,6 +164,7 @@ class Scene2 extends Phaser.Scene{
         tween = this.tweens.add({
             targets: ennemi2,
             x: 1150,
+            y:500,
             paused: false,
             yoyo: true,
             repeat: -1
@@ -121,6 +173,31 @@ class Scene2 extends Phaser.Scene{
     }
 
     update(){
+        if (oeuf==true)
+        {
+            nbOeuf.anims.play("1Oeuf",true);
+        }
+        else 
+        {
+            nbOeuf.anims.play("0Oeuf",true);
+        }
+        if (actuVie==true)
+        {
+            if (life==2)
+            {
+                vie.anims.play("DeuxC",true);
+            }
+            else if (life==1)
+            {
+                vie.anims.play("UnC",true);
+            }
+        }
+        if (gameOver==true)
+        {
+            vie.anims.play("ZeroC",true);
+            this.physics.pause();
+            return;
+        }
         if (anim==true)
         {
             ennemi.anims.play("mob",true);
@@ -136,10 +213,7 @@ class Scene2 extends Phaser.Scene{
         }
         
         //Controle Manette 
-        this.input.gamepad.once('connected', function (pad){
-            paddleConnected=true;
-            paddle=pad;
-        });
+        
         if (resetCursors==true)
         {
             if (paddleConnected==true)
@@ -165,10 +239,6 @@ class Scene2 extends Phaser.Scene{
         }
         if (paddleConnected==true){
               //Inventaire 
-              if (paddle.A)
-              {
-
-              }
 
               // Bas
             if (paddle.down){
@@ -264,10 +334,6 @@ class Scene2 extends Phaser.Scene{
         //Controle Clavier 
         else {
             //Inventaire 
-            if (buttonI.isDown)
-            {
-              
-            }
            
         // Controle Clavier
               // Bas
@@ -380,6 +446,7 @@ class Scene2 extends Phaser.Scene{
                     y = 550;
                     sceneUnDeux=false;
                     resetCursors=true;
+                    actuVie=true;
                     this.scene.start("Scene1");
                     this.scene.pause("Scene2");
                 }
@@ -391,12 +458,12 @@ function Sortie12(){
     sceneUnDeux=true;
 }
 
-function Degat(player,ennemie) 
+function Degat() 
     {
-        if (vie>0 && recovery==false){
-            vie-=1;
-            if (vie==2){
-                life.anims.play("deux_coeur")
+        if (life>0 && recovery==false){
+            life-=1;
+            actuVie=true;
+            if (life==2){
                 player.setTint(0x8224B8);
                 player.setTint(0xF5BAFD);
                 player.setTint(0xBADCFD);
@@ -405,8 +472,7 @@ function Degat(player,ennemie)
                 player.setTint(0xFDBAC7);
 
         }
-            if (vie==1){
-                life.anims.play("un_coeur")
+            if (life==1){
                 player.setTint(0x8224B8);
                 player.setTint(0xF5BAFD);
                 player.setTint(0xBADCFD);
@@ -414,15 +480,17 @@ function Degat(player,ennemie)
                 player.setTint(0xFABAFD);
                 player.setTint(0xFDBAC7);
         }   
-            if (vie==0){
-                life.anims.play("mort")
+            if (life==0){
                 player.setTint(0x8224B8);
                 player.setTint(0xF5BAFD);
                 player.setTint(0xBADCFD);
                 player.setTint(0xBAFDC8);
                 player.setTint(0xFABAFD);
                 player.setTint(0xFDBAC7);
+                gameOver=true;
         }   
     }
-    recovery=true
+    recovery=true;
     }
+
+  

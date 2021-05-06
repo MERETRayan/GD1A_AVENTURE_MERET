@@ -63,8 +63,15 @@ class Menu extends Phaser.Scene{
     }
     
     update(){
+        //Controle Manette 
+        this.input.gamepad.once('connected', function (pad){
+            paddleConnected=true;
+            paddle=pad;
+        });
+
         if (resetEnter==true)
         {
+            
             buttonEnter.isUp=true;
             buttonEnter.isDown=false;
             resetEnter=false;
@@ -77,12 +84,99 @@ class Menu extends Phaser.Scene{
             button3.anims.play('Credit_Off', true);
             base = true ;
         }
-        //Controle Manette 
-        this.input.gamepad.once('connected', function (pad){
-            paddleConnected=true;
-            paddle=pad;
-        });
+        
+        if (paddleConnected==true)
+        {
+        if (paddle.down && button==0 && down==false)
+        {
+            button=1;
+            button1.anims.play('Play_On', true);
+            button2.anims.play('Controle_Off', true);
+            button3.anims.play('Credit_Off', true);
+            down = true ;
+        } 
+        else if (paddle.down && button==1 && down==false)
+        {
+            button=2;
+            button1.anims.play('Play_Off', true);
+            button2.anims.play('Controle_On', true);
+            button3.anims.play('Credit_Off', true);
+            down = true ;
 
+        }
+        else if (paddle.down && button==2 && down==false)
+        {
+            button=0;
+            button1.anims.play('Play_Off', true);
+            button2.anims.play('Controle_Off', true);
+            button3.anims.play('Credit_On', true);
+            down = true ;
+
+        }
+        else if (paddle.up && button==1 && up==false)
+        {
+            button=0;
+            button1.anims.play('Play_Off', true);
+            button2.anims.play('Controle_Off', true);
+            button3.anims.play('Credit_On', true);
+            up = true ;
+
+        }
+        else if (paddle.up && button==0 && up==false)
+        {
+            button=2;
+            button1.anims.play('Play_Off', true);
+            button2.anims.play('Controle_On', true);
+            button3.anims.play('Credit_Off', true);
+            up = true ;
+
+        }
+        else if (paddle.up && button==2 && up==false)
+        {
+            button=1;
+            button1.anims.play('Play_On', true);
+            button2.anims.play('Controle_Off', true);
+            button3.anims.play('Credit_Off', true);
+            up = true ;
+
+        }
+        if (paddle.down)
+        {
+            down=false ;
+        }
+        if (paddle.up)
+        {
+            up=false ;
+        }
+
+        if (button==1 && paddle.A && menu==true)
+        {
+            this.scene.start("Scene3");
+            this.scene.pause("Menu");
+        }
+        else if (paddle.A && menu==true && button==2)
+        {   
+            menu=false;
+            resetB=true;
+            this.scene.start("Controle");
+            this.scene.pause("Menu");
+        }
+        else if (button==0 && paddle.A && menu==true)
+        {
+            menu=false;
+            resetB=true;
+            this.scene.start("Credit");
+            this.scene.pause("Menu");
+        }
+
+      
+        if (paddle.A==false)
+        {
+            menu = true ;
+        }
+    }
+        else 
+        {
         if (cursors.down.isDown && button==0 && down==false)
         {
             button=1;
@@ -172,5 +266,5 @@ class Menu extends Phaser.Scene{
         }
     }  
 }
-        
+}       
 

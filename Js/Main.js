@@ -70,11 +70,24 @@ var sceneDeuxTrois = false ;
 var sceneUnDeux = false ;
 var sceneDeuxUn = false ;
 
+var life = 3;
+var vie; 
+var actuVie = true;
 
-var vie = 3; 
 var timerRecovery=0;
-var recovery=false ;
+var recovery=true ;
 
 var tweens;
 var tween ;
 var anim = true ;
+
+var gameOver=false;
+
+var egg;
+var oeuf = false ;
+
+var nbOeuf ;
+var oeufnb = 0;
+
+var barriere = true  ;
+var barriere1;
