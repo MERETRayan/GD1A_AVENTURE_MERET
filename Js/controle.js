@@ -6,7 +6,7 @@ init(data){
     var deuxieme = false ; 
 }
 preload(){
-    this.load.image("controle","Asset/controle.jpg");
+    this.load.image("controle","Asset/controle.png");
 
 }
 create(){
